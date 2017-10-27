@@ -20,8 +20,8 @@ N_Radii = 1000
 Rp = np.logspace(-2, 2.4, N_Radii, base=10)
 Nbins = 15
 
-P_file_path = "/home/tmcclintock/Desktop/des_wl_work/DATA_FILES/y1_data_files/P_files/"
-cluster_file_path = "/home/tmcclintock/Desktop/des_wl_work/DATA_FILES/y1_data_files/cluster_files/clusters_z%d_l%d.txt"
+P_file_path = "./P_files/"
+cluster_file_path = "./cluster_files/clusters_z%d_l%d.txt"
 
 def component_realizations(zi, li, MLoff = False, MCoff = False, do_miscentering = True):
     if MLoff: ML_scatter = 0
