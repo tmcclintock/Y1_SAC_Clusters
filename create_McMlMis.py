@@ -26,7 +26,7 @@ base = "/Users/tmcclintock/Data/DATA_FILES/y1_data_files/"
 P_file_path = base+"/P_files/"
 #Cluster information for each stack
 cluster_file_path = base+"/cluster_files/clusters_z%d_l%d.txt"
-for i in range(2, -1, -1): #z index 2, 1, 0
+for i in range(1, 0, -1): #z index 2, 1, 0
     for j in range(6, 5, -1): #lambda index 6 to 3, not doing 2,1,0
         #Start by getting xi_mm, which doesn't depend on mass
         k = np.loadtxt(P_file_path+"k.txt")
@@ -46,7 +46,6 @@ for i in range(2, -1, -1): #z index 2, 1, 0
             N_kept = len(M)
             mean_DeltaSigma = np.zeros_like(R_perp)
             biases = ct.bias.bias_at_M(M, k, Plin, om)
-            print M.shape, biases.shape, N_kept
             
             for cl in range(N_kept): #Loop over clusters
                 xi_nfw = ct.xi.xi_nfw_at_R(R, M[cl], conc[cl], om)
