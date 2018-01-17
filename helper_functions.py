@@ -39,14 +39,13 @@ def get_cosmo_dict():
     return cosmo
 
 def get_cluster_parameters(lams, zs, c_spline, N_want=1000, ML_scatter=0.25, MC_scatter=0.16, do_miscentering=True):
-    #print "ML precent scatter = ",ML_scatter
     N = len(lams)
     keep_inds = np.random.rand(N) < float(N_want)/N
     lams = lams[keep_inds]
     zs = zs[keep_inds]
     N = len(lams)
     #Masses by default have 25% scatter, units get changed to Msun/h
-    Mp = h*10**14.371
+    Mp = h*10**14.371 #Mass pivot, converted to Msun/h
     Masses = np.exp(np.log(Mp*(lams/30.0)**1.12)-0.5*ML_scatter**2 + ML_scatter*np.random.randn(N))
     #Draw concentrations with some amount of scatter from DK15, with 16% scatter using base10
     cs = np.array([c_spline(mi,zi) for mi,zi in zip(Masses,zs)])[:,0]
@@ -56,7 +55,9 @@ def get_cluster_parameters(lams, zs, c_spline, N_want=1000, ML_scatter=0.25, MC_
     ismis = np.random.rand(N) < 0.32 #Y1 prior
     if not do_miscentering:
         ismis *= False
-    tau = np.random.randn(N)*0.003 +0.153
+    #Below this is incorrect, which means the SACs must be re-run
+    #tau = np.random.randn(N)*0.003 +0.153
+    tau = 0.153
     Rlam = (lams/100)**0.2 #Mpc/h
     Rmis = tau*Rlam #Mpc/h
     x, y = np.random.randn(N), np.random.randn(N)

@@ -4,7 +4,7 @@ Make individual components of the SAC for one bin
 import sys, os
 import numpy as np
 import helper_functions as HF
-import clusterwl
+import cluster_toolkit as ct
 import matplotlib.pyplot as plt
 
 #Get concentration as a function of M and z 
@@ -34,7 +34,7 @@ def component_realizations(zi, li, MLoff = False, MCoff = False, do_miscentering
     zs, lams = np.loadtxt(cluster_file_path%(zi, lj)).T
     zlens = np.mean(zs)
     R     = np.logspace(-2, 3, N_Radii, base=10) #go higher than BAO
-    xi_mm = clusterwl.xi.xi_mm_at_R(R, k, Pnl)
+    xi_mm = ct.xi.xi_mm_at_R(R, k, Pnl)
     R_perp = np.logspace(-2, 2.4, N_Radii, base=10)
     DeltaSigma_realizations = np.zeros((N_realizations, N_Radii))
     print "Starting realizations for z%d l%d"%(zi,lj)
@@ -43,16 +43,16 @@ def component_realizations(zi, li, MLoff = False, MCoff = False, do_miscentering
         N_kept = len(M)
         mean_DeltaSigma = np.zeros_like(R_perp)
         for cl in range(N_kept): #Loop over clusters
-            xi_nfw = clusterwl.xi.xi_nfw_at_R(R, M[cl], conc[cl], om)
-            bias = clusterwl.bias.bias_at_M(M[cl], k, Plin, om)
-            xi_2halo = clusterwl.xi.xi_2halo(bias, xi_mm)
-            xi_hm    = clusterwl.xi.xi_hm(xi_nfw, xi_2halo)
-            Sigma    = clusterwl.deltasigma.Sigma_at_R(R_perp, R, xi_hm, M[cl], conc[cl], om)
+            xi_nfw = ct.xi.xi_nfw_at_R(R, M[cl], conc[cl], om)
+            bias = ct.bias.bias_at_M(M[cl], k, Plin, om)
+            xi_2halo = ct.xi.xi_2halo(bias, xi_mm)
+            xi_hm    = ct.xi.xi_hm(xi_nfw, xi_2halo)
+            Sigma    = ct.deltasigma.Sigma_at_R(R_perp, R, xi_hm, M[cl], conc[cl], om)
             if not ismis[cl]: #isn't miscentered
-                DeltaSigma = clusterwl.deltasigma.DeltaSigma_at_R(R_perp, R_perp, Sigma, M[cl], conc[cl], om)
+                DeltaSigma = ct.deltasigma.DeltaSigma_at_R(R_perp, R_perp, Sigma, M[cl], conc[cl], om)
             else: #is miscentered
-                Sigma_single  = clusterwl.miscentering.Sigma_mis_single_at_R(R_perp, R_perp, Sigma, M[cl], conc[cl], om, Rmis[cl])
-                DeltaSigma = clusterwl.miscentering.DeltaSigma_mis_at_R(R_perp, R_perp, Sigma_single)
+                Sigma_single  = ct.miscentering.Sigma_mis_single_at_R(R_perp, R_perp, Sigma, M[cl], conc[cl], om, Rmis[cl])
+                DeltaSigma = ct.miscentering.DeltaSigma_mis_at_R(R_perp, R_perp, Sigma_single)
             mean_DeltaSigma += DeltaSigma/N_kept
         DeltaSigma_realizations[real] += mean_DeltaSigma
     print "Made individual realizations for z%d l%d"%(zi,lj)
@@ -69,9 +69,9 @@ def merge_realizations(zi, lj, dss):
     Redges = np.logspace(np.log(binmin), np.log(binmax), num=Nbins+1, base=np.e)
     Rbins = (Redges[:-1]+Redges[1:])/2.
     dsm = np.mean(dss, 0)
-    clusterwl.averaging.average_profile_in_bins(Redges, Rp, dsm, amds)
+    ct.averaging.average_profile_in_bins(Redges, Rp, dsm, amds)
     for r in range(N_realizations):
-        clusterwl.averaging.average_profile_in_bins(Redges, Rp, dss[r], adss[r])
+        adss[r] = ct.averaging.average_profile_in_bins(Redges, Rp, dss[r])
         C = np.zeros((Nbins, Nbins))
     #Note: deltasigmas are in Msun h/pc^2 comoving at this point
     for ii in range(Nbins):
