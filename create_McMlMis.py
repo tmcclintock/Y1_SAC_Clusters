@@ -26,7 +26,7 @@ base = "/Users/tmcclintock/Data/DATA_FILES/y1_data_files/"
 P_file_path = base+"/P_files/"
 #Cluster information for each stack
 cluster_file_path = base+"/cluster_files/clusters_z%d_l%d.txt"
-for i in range(2, 1, -1): #z index 2, 1, 0
+for i in range(2, -1, -1): #z index 2, 1, 0
     for j in range(6, 5, -1): #lambda index 6 to 3, not doing 2,1,0
         #Start by getting xi_mm, which doesn't depend on mass
         k = np.loadtxt(P_file_path+"k.txt")
@@ -35,7 +35,7 @@ for i in range(2, 1, -1): #z index 2, 1, 0
         zs, lams = np.loadtxt(cluster_file_path%(i, j)).T
         zlens = np.mean(zs)
         R     = np.logspace(-2, 3, N_Radii, base=10) #go higher than BAO
-        xi_mm = ct.xi.xi_mm_at_R(R, k, Pnl, N=500)
+        xi_mm = ct.xi.xi_mm_at_R(R, k, Pnl, exact=True)
         R_perp = np.logspace(-2, 2.4, N_Radii, base=10)
 
         DeltaSigma_realizations = np.zeros((N_realizations, N_Radii))
@@ -60,8 +60,9 @@ for i in range(2, 1, -1): #z index 2, 1, 0
                     Sigma_single  = ct.miscentering.Sigma_mis_single_at_R(R_perp, R_perp, Sigma, M[cl], conc[cl], om, Rmis[cl])
                     DeltaSigma = ct.miscentering.DeltaSigma_mis_at_R(R_perp, R_perp, Sigma_single)
                 mean_DeltaSigma += DeltaSigma/N_kept
-                print "cl%d"%cl
+                
             DeltaSigma_realizations[real] = mean_DeltaSigma
+            print "Made realization %d"%real
         print "Made realizations for z%d l%d"%(i,j)
         #np.savetxt("output_files/stack_realizations_MLps%d_z%d_l%d.txt"%(ML_percent_scatter, i, j), DeltaSigma_realizations)
         np.savetxt("fiducial_covariances/stack_realizations/stack_realizations_z%d_l%d.txt"%(i, j), DeltaSigma_realizations)
