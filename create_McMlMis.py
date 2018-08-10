@@ -23,11 +23,13 @@ ML_percent_scatter = 25
 #Power spectrum at the redshift of each clusters
 #laptop:
 base = "/Users/tmcclintock/Data/DATA_FILES/y1_data_files/"
+#calvin
+base = "/calvin1/tmcclintock/DES_DATA_FILES/DATA_FILES/y1_data_files/"
 P_file_path = base+"/P_files/"
 #Cluster information for each stack
 cluster_file_path = base+"/cluster_files/clusters_z%d_l%d.txt"
-for i in range(1, 0, -1): #z index 2, 1, 0
-    for j in range(6, 5, -1): #lambda index 6 to 3, not doing 2,1,0
+for i in range(2, -1, -1): #z index 2, 1, 0
+    for j in range(1, -1, -1): #lambda index 6 to 3, not doing 2,1,0
         #Start by getting xi_mm, which doesn't depend on mass
         k = np.loadtxt(P_file_path+"k.txt")
         Plin = np.genfromtxt(P_file_path+"./plin_z%d_l%d.txt"%(i,j))
@@ -61,7 +63,8 @@ for i in range(1, 0, -1): #z index 2, 1, 0
                 mean_DeltaSigma += DeltaSigma/N_kept
                 
             DeltaSigma_realizations[real] = mean_DeltaSigma
-            print "Made realization %d"%real
+            if real%100 == 0:
+                print "Made realization %d"%real
         print "Made realizations for z%d l%d"%(i,j)
         #np.savetxt("output_files/stack_realizations_MLps%d_z%d_l%d.txt"%(ML_percent_scatter, i, j), DeltaSigma_realizations)
         np.savetxt("fiducial_covariances/stack_realizations/stack_realizations_z%d_l%d.txt"%(i, j), DeltaSigma_realizations)
